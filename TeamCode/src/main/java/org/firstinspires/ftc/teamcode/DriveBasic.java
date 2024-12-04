@@ -191,6 +191,19 @@ public class DriveBasic extends OpMode {
             outPos1 += (int) (gamepad2.left_stick_y * 15.0);
         }
 
+        if (gamepad1.dpad_down)
+        {
+            robot.kickLeft.setPosition(0.0); // FIND DATA FOR DOWN
+            robot.kickRight.setPosition(0.0); //FIND DATA FOR DOWN
+        }
+
+        if (gamepad1.dpad_up)
+        {
+            robot.kickLeft.setPosition(1.0); // FIND DATA FOR UP
+            robot.kickRight.setPosition(1.0); //FIND DATA FOR UP
+        }
+
+
         if (gamepad2.left_stick_y < -0.4)
         {
             OUT_ARM_SPEED = 1.0;
@@ -231,6 +244,8 @@ public class DriveBasic extends OpMode {
         // - add max values for the arms
         // - also replace the hotkeys for y and b and their maxes
         // - button pick up rotator and transfer and go back
+
+
 
 
         if (gamepad2.left_trigger > 0.4)

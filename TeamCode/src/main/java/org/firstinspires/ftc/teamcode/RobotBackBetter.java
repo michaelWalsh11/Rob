@@ -25,6 +25,9 @@ public class RobotBackBetter {
     public Servo rotator = null;
     public Servo outtake = null;
 
+    public Servo kickLeft = null;
+    public Servo kickRight = null;
+
     public IMU imu;
     public double offset = 0;//in degrees
 
@@ -75,6 +78,9 @@ public class RobotBackBetter {
         grasper = hwMap.servo.get("grasper");
         rotator = hwMap.servo.get("rotator");
         outtake = hwMap.servo.get("outtake");
+
+        kickLeft = hwMap.servo.get("kickleft");
+        kickRight = hwMap.servo.get("kickright");
 
         imu = hwMap.get(IMU.class, "imu");
 
