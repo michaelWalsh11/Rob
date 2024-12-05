@@ -60,7 +60,7 @@ public class ServoTester extends OpMode {
         robot.outTake1.setPower(OUT_ARM_SPEED);
 
         robot.outTake2.setPower(1.0);
-        robot.outTake2.setTargetPosition(-amp);
+        robot.outTake2.setTargetPosition(amp);
         robot.outTake2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.outTake2.setPower(OUT_ARM_SPEED);
     }

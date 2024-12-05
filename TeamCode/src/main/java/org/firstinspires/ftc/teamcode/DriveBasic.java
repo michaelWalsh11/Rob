@@ -50,6 +50,14 @@ public class DriveBasic extends OpMode {
     private double CLIMB_POWER = 0.8;
 
 
+    public double KICKRIGHT_DOWN = 0.0;
+    public double KICKLEFT_DOWN = 0.0;
+    public double KICKRIGHT_UP = 0.0;
+    public double KICKLEFT_UP = 0.0;
+
+    public double OUTTAKE_DROP = 0.0;
+
+
     @Override /* * */
     public void init() {
 
@@ -150,7 +158,7 @@ public class DriveBasic extends OpMode {
         robot.outTake1.setPower(OUT_ARM_SPEED);
 
         robot.outTake2.setPower(1.0);
-        robot.outTake2.setTargetPosition(-amp);
+        robot.outTake2.setTargetPosition(amp);
         robot.outTake2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.outTake2.setPower(OUT_ARM_SPEED);
     }
@@ -193,14 +201,14 @@ public class DriveBasic extends OpMode {
 
         if (gamepad1.dpad_down)
         {
-            robot.kickLeft.setPosition(0.0); // FIND DATA FOR DOWN
-            robot.kickRight.setPosition(0.0); //FIND DATA FOR DOWN
+            robot.kickLeft.setPosition(KICKLEFT_DOWN); // FIND DATA FOR DOWN
+            robot.kickRight.setPosition(KICKRIGHT_DOWN); //FIND DATA FOR DOWN
         }
 
         if (gamepad1.dpad_up)
         {
-            robot.kickLeft.setPosition(1.0); // FIND DATA FOR UP
-            robot.kickRight.setPosition(1.0); //FIND DATA FOR UP
+            robot.kickLeft.setPosition(KICKLEFT_UP); // FIND DATA FOR UP
+            robot.kickRight.setPosition(KICKRIGHT_UP); //FIND DATA FOR UP
         }
 
 
@@ -237,7 +245,7 @@ public class DriveBasic extends OpMode {
 
         if (gamepad1.right_trigger > 0.4 || gamepad1.x)
         {
-            robot.outtake.setPosition(1.0);
+            robot.outtake.setPosition(OUTTAKE_DROP); // drop pixel
         }
 
         //todo
