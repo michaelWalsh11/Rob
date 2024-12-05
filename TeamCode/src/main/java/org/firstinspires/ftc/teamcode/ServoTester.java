@@ -191,15 +191,15 @@ public class ServoTester extends OpMode {
             inPos1 -= (int) (Math.abs(gamepad2.right_stick_y) * 15.0);
         }
 
-        outTake(outPos1);
-        inTake(inPos1);
+//        outTake(outPos1);
+//        inTake(inPos1);
 
 
         telemetry.addLine("Servo Tuning (controller 2");
         telemetry.addLine("");
-        telemetry.addLine("rotatorPos (left and right bumper) " + rotatePos);
-        telemetry.addLine("grasperPos (y and a) " + rotatePos1);
-        telemetry.addLine("outtakePos (b and x) " + rotatePos2);
+        telemetry.addLine("rotatorPos (left and right bumper) " + rotatePos + "  " + robot.rotator.getPosition());
+        telemetry.addLine("grasperPos (y and a) " + rotatePos1 + "  " + robot.grasper.getPosition());
+        telemetry.addLine("outtakePos (b and x) " + rotatePos2 + "  " + robot.outtake.getPosition());
         telemetry.addLine("");
         telemetry.addLine("");
         telemetry.addLine("Arm Tuning (controller 2");
@@ -210,8 +210,8 @@ public class ServoTester extends OpMode {
         telemetry.addLine("");
         telemetry.addLine("Servo Tuning (controller 1");
         telemetry.addLine("");
-        telemetry.addLine("kickstand 1 pos (dpad_up and dpad_down) " + rotatePos3);
-        telemetry.addLine("kickstand 2 pos (a and y) " + rotatePos4);
+        telemetry.addLine("kickstand 1 pos (dpad_up and dpad_down) " + rotatePos3 + "  " + robot.kickLeft.getPosition());
+        telemetry.addLine("kickstand 2 pos (a and y) " + rotatePos4 + "  " + robot.kickRight.getPosition());
 
 
     }
