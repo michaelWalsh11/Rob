@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.DriveConstants.*;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -43,8 +45,6 @@ public class DriveBasic extends OpMode {
 
 
     private double DRIVE_SPEED = 1.0;
-
-    DriveConstants drive = new DriveConstants();
 
 
     @Override /* * */
@@ -170,13 +170,13 @@ public class DriveBasic extends OpMode {
     {
         if (gamepad2.dpad_up)
         {
-            robot.grasper.setPosition(drive.GRASPER_CLOSE); // test pos and find it close pos
+            robot.grasper.setPosition(GRASPER_CLOSE); // test pos and find it close pos
             Thread.sleep(200);
-            robot.outtake.setPosition(drive.OUTTAKE_INTAKE); // tune to find it down pos to intake
-            robot.rotator.setPosition(drive.ROTATOR_TRANSFER); // test pos and find it outtake pos
+            robot.outtake.setPosition(OUTTAKE_INTAKE); // tune to find it down pos to intake
+            robot.rotator.setPosition(ROTATOR_TRANSFER); // test pos and find it outtake pos
             Thread.sleep(300);
-            robot.grasper.setPosition(drive.GRASPER_OPEN); // open pos
-            robot.rotator.setPosition(drive.ROTATOR_GROUND); // down pos
+            robot.grasper.setPosition(GRASPER_OPEN); // open pos
+            robot.rotator.setPosition(ROTATOR_GROUND); // down pos
         }
     }
 
@@ -190,14 +190,14 @@ public class DriveBasic extends OpMode {
 
         if (gamepad1.dpad_down)
         {
-            robot.kickLeft.setPosition(drive.KICKLEFT_DOWN); // FIND DATA FOR DOWN
-            robot.kickRight.setPosition(drive.KICKRIGHT_DOWN); //FIND DATA FOR DOWN
+            robot.kickLeft.setPosition(KICKLEFT_DOWN); // FIND DATA FOR DOWN
+            robot.kickRight.setPosition(KICKRIGHT_DOWN); //FIND DATA FOR DOWN
         }
 
         if (gamepad1.dpad_up)
         {
-            robot.kickLeft.setPosition(drive.KICKLEFT_UP); // FIND DATA FOR UP
-            robot.kickRight.setPosition(drive.KICKRIGHT_UP); //FIND DATA FOR UP
+            robot.kickLeft.setPosition(KICKLEFT_UP); // FIND DATA FOR UP
+            robot.kickRight.setPosition(KICKRIGHT_UP); //FIND DATA FOR UP
         }
 
 
@@ -220,13 +220,13 @@ public class DriveBasic extends OpMode {
             inPos1 -= (int) (Math.abs(gamepad2.right_stick_y) * 15.0);
         }
 
-        if (outPos1 > 0)
+        if (outPos1 < 0)
         {
             outPos1 = 0;
             OUT_ARM_SPEED = 0;
         }
 
-        if (inPos1 > 0)
+        if (inPos1 < 0)
         {
             inPos1 = 0;
             IN_ARM_SPEED = 0.0;
@@ -234,7 +234,7 @@ public class DriveBasic extends OpMode {
 
         if (gamepad1.right_trigger > 0.4 || gamepad1.x)
         {
-            robot.outtake.setPosition(drive.OUTTAKE_DROP); // drop pixel
+            robot.outtake.setPosition(OUTTAKE_DROP); // drop pixel
         }
 
         //todo
@@ -247,35 +247,35 @@ public class DriveBasic extends OpMode {
 
         if (gamepad2.left_trigger > 0.4)
         {
-            robot.grasper.setPosition(drive.GRASPER_OPEN);
+            robot.grasper.setPosition(GRASPER_OPEN);
         }
 
         if (gamepad2.right_trigger > 0.4)
         {
-            robot.grasper.setPosition(drive.GRASPER_CLOSE);
+            robot.grasper.setPosition(GRASPER_CLOSE);
         }
 
         if (gamepad2.b && !gamepad2.start)
         {
-            inPos1 = drive.INTAKE_MIN;
+            inPos1 = INTAKE_MIN;
             inTake(inPos1);
         }
 
         if (gamepad2.a && !gamepad2.start)
         {
-            inPos1 = drive.INTAKE_MAX;
+            inPos1 = INTAKE_MAX;
             inTake(inPos1);
         }
 
         if (gamepad2.x)
         {
-            outPos1 = drive.OUTTAKE_MAX;
+            outPos1 = OUTTAKE_MAX;
             outTake(outPos1);
         }
 
         if (gamepad2.y) {
-            outPos1 = drive.OUTTAKE_MIN;
-            robot.outtake.setPosition(drive.OUTTAKE_DROP);
+            outPos1 = OUTTAKE_MIN;
+            robot.outtake.setPosition(OUTTAKE_DROP);
             outTake(outPos1);
         }
 
