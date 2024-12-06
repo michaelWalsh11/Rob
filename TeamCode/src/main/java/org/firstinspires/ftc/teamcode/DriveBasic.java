@@ -96,8 +96,25 @@ public class DriveBasic extends OpMode {
 
     }
 
+    public boolean dpadLeftPressed = false;
+    public boolean isControlsActive = false;
+
     @Override
     public void loop() {
+
+        if (gamepad1.dpad_left && !dpadLeftPressed)
+        {
+            isControlsActive = !isControlsActive;
+            dpadLeftPressed = true;
+        }
+        else if (!gamepad1.dpad_left)
+        {
+            dpadLeftPressed = false;
+        }
+
+        if (isControlsActive) {
+            controls();
+        }
 
         drive();
         grasper();
@@ -112,6 +129,40 @@ public class DriveBasic extends OpMode {
                 throw new RuntimeException(e);
             }
         }).start();
+    }
+    public void controls()
+    {
+        // Gamepad 1 Controls
+        telemetry.addLine("GAMEPAD 1 CONTROLS:");
+        telemetry.addLine("LEFT STICK (x, y): Controls movement");
+        telemetry.addLine(" - LEFT STICK X: Strafing");
+        telemetry.addLine(" - LEFT STICK Y: Forward/backward movement");
+        telemetry.addLine("RIGHT STICK (x): Controls turning");
+        telemetry.addLine("DPAD_UP: Raises kickstands (left and right)");
+        telemetry.addLine("DPAD_LEFT: toggles the control menu");
+        telemetry.addLine("DPAD_DOWN: Lowers kickstands (left and right)");
+        telemetry.addLine("RIGHT_TRIGGER: Drops the outtake mechanism");
+        telemetry.addLine("X: Also drops the outtake mechanism");
+        telemetry.addLine("A: Toggles drive speed between full (1.0) and reduced (0.4)");
+
+        telemetry.addLine("");
+
+        // Gamepad 2 Controls
+        telemetry.addLine("GAMEPAD 2 CONTROLS:");
+        telemetry.addLine("LEFT STICK (y): Controls outtake arm movement");
+        telemetry.addLine(" - Positive for up, negative for down");
+        telemetry.addLine("RIGHT STICK (y): Controls intake arm movement");
+        telemetry.addLine(" - Positive for out, negative for in");
+        telemetry.addLine("LEFT_TRIGGER: Opens the grasper");
+        telemetry.addLine("RIGHT_TRIGGER: Closes the grasper");
+        telemetry.addLine("DPAD_UP: Initiates intake routine");
+        telemetry.addLine("A: Sets intake arm to maximum position");
+        telemetry.addLine("B: Sets intake arm to minimum position");
+        telemetry.addLine("X: Sets outtake arm to maximum position");
+        telemetry.addLine("Y: Sets outtake arm to minimum position and moves outtake to intake position");
+        telemetry.addLine("LEFT_BUMPER: Rotates the grasper to the left");
+        telemetry.addLine("RIGHT_BUMPER: Rotates the grasper to the right");
+
     }
 
     public void telemetry()
@@ -170,13 +221,17 @@ public class DriveBasic extends OpMode {
     {
         if (gamepad2.dpad_up)
         {
-            robot.grasper.setPosition(GRASPER_CLOSE); // test pos and find it close pos
-            Thread.sleep(200);
-            robot.outtake.setPosition(OUTTAKE_INTAKE); // tune to find it down pos to intake
-            robot.rotator.setPosition(ROTATOR_TRANSFER); // test pos and find it outtake pos
-            Thread.sleep(300);
-            robot.grasper.setPosition(GRASPER_OPEN); // open pos
-            robot.rotator.setPosition(ROTATOR_GROUND); // down pos
+            robot.grasper.setPosition(GRASPER_CLOSE);
+            Thread.sleep(AFTER_CLOSE_SLEEP);
+            robot.rotator.setPosition(ROTATOR_TRANSFER);
+            rotatePos = ROTATOR_TRANSFER;
+            Thread.sleep(1000);
+            robot.outtake.setPosition(OUTTAKE_INTAKE);
+            Thread.sleep(TRANSFER_TIME);
+            robot.grasper.setPosition(GRASPER_OPEN);
+            Thread.sleep(AFTER_OPEN_SLEEP);
+            robot.rotator.setPosition(ROTATOR_GROUND);
+            rotatePos = ROTATOR_GROUND;
         }
     }
 
@@ -185,7 +240,7 @@ public class DriveBasic extends OpMode {
         if (gamepad2.left_stick_y > 0.4)
         {
             OUT_ARM_SPEED = 1.0;
-            outPos1 += (int) (gamepad2.left_stick_y * 15.0);
+            outPos1 += (int) (gamepad2.left_stick_y * OUTSLIDE_SPEED);
         }
 
         if (gamepad1.dpad_down)
@@ -204,20 +259,20 @@ public class DriveBasic extends OpMode {
         if (gamepad2.left_stick_y < -0.4)
         {
             OUT_ARM_SPEED = 1.0;
-            outPos1 -= (int) (Math.abs(gamepad2.left_stick_y) * 15.0);
+            outPos1 -= (int) (Math.abs(gamepad2.left_stick_y) * OUTSLIDE_SPEED);
         }
 
         //auto intake
         if (gamepad2.right_stick_y > 0.4)
         {
             IN_ARM_SPEED = 1.0;
-            inPos1 += (int) (gamepad2.right_stick_y * 15.0);
+            inPos1 += (int) (gamepad2.right_stick_y * INSLIDE_SPEED);
         }
 
         if (gamepad2.right_stick_y < -0.4)
         {
             IN_ARM_SPEED = 1.0;
-            inPos1 -= (int) (Math.abs(gamepad2.right_stick_y) * 15.0);
+            inPos1 -= (int) (Math.abs(gamepad2.right_stick_y) * INSLIDE_SPEED);
         }
 
         if (outPos1 < 0)
@@ -234,7 +289,7 @@ public class DriveBasic extends OpMode {
 
         if (gamepad1.right_trigger > 0.4 || gamepad1.x)
         {
-            robot.outtake.setPosition(OUTTAKE_DROP); // drop pixel
+            robot.outtake.setPosition(OUTTAKE_DROP);
         }
 
         //todo
@@ -258,28 +313,25 @@ public class DriveBasic extends OpMode {
         if (gamepad2.b && !gamepad2.start)
         {
             inPos1 = INTAKE_MIN;
-            inTake(inPos1);
         }
 
         if (gamepad2.a && !gamepad2.start)
         {
             inPos1 = INTAKE_MAX;
-            inTake(inPos1);
         }
 
         if (gamepad2.x)
         {
             outPos1 = OUTTAKE_MAX;
-            outTake(outPos1);
         }
 
         if (gamepad2.y) {
+
             outPos1 = OUTTAKE_MIN;
-            robot.outtake.setPosition(OUTTAKE_DROP);
-            outTake(outPos1);
+            robot.outtake.setPosition(OUTTAKE_INTAKE);
         }
 
-        outTake(outPos1);
+        //outTake(outPos1);
         inTake(inPos1);
 
 
@@ -289,27 +341,14 @@ public class DriveBasic extends OpMode {
     public void grasper()
     {
 
-        //todo
-        // - tune all values because pure guessing
-
-        //open and close grasper
-        if (gamepad2.right_trigger > 0.4)
-        {
-            robot.grasper.setPosition(1.0);
-        }
-        if (gamepad2.left_trigger > 0.4)
-        {
-            robot.grasper.setPosition(0.0);
-        }
-
         //twist left and right
         if (gamepad2.left_bumper)
         {
-            rotatePos = Math.min(rotatePos + 0.01, 1.0);;
+            rotatePos = Math.min(rotatePos + ROTATE_SPEED, 1.0);;
         }
         if (gamepad2.right_bumper)
         {
-            rotatePos = Math.max(rotatePos - 0.01, 0.0);
+            rotatePos = Math.max(rotatePos - ROTATE_SPEED, 0.0);
         }
 
         robot.rotator.setPosition(rotatePos);
