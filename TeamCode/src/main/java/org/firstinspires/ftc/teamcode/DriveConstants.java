@@ -21,6 +21,6 @@ public class DriveConstants {
     public static int INTAKE_MAX = 100; //DO
 
     public static int OUTTAKE_MIN = 0;
-    public static int OUTTAKE_MAX = 100; //DO
+    public static int OUTTAKE_MAX = 110; //DO
 
 }
