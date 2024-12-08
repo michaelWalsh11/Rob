@@ -21,12 +21,12 @@ public class DriveConstants {
     public static int INTAKE_MAX = 100; //DO
 
     public static int OUTTAKE_MIN = 0;
-    public static int OUTTAKE_MAX = 110; //DO
+    public static int OUTTAKE_MAX = 500; //DO
 
     //sleep constants
     public static int AFTER_CLOSE_SLEEP = 200;
-    public static int TRANSFER_TIME = 300;
-    public static int AFTER_OPEN_SLEEP = 300;
+    public static int TRANSFER_TIME = 500;
+    public static int AFTER_OPEN_SLEEP = 500;
 
     //speeds
     public static double INSLIDE_SPEED = 15.0;
