@@ -212,66 +212,36 @@ public class DriveBasic extends OpMode {
         }
     }
 
-    public void outTake(int amp)
-    {
-        //robot.outTake1.setPower(0.8);
-        robot.outTake1.setTargetPosition(amp);
-        robot.outTake1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.outTake1.setPower(OUT_ARM_SPEED);
-
-        //robot.outTake2.setPower(0.8);
-        robot.outTake2.setTargetPosition(amp);
-        robot.outTake2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.outTake2.setPower(OUT_ARM_SPEED2);
-    }
-
-    public void verticalSlider()
-    {
-        //Left and Right Stick
-        if (gamepad2.left_stick_y > 0.4)
-        {
-            OUT_ARM_SPEED = 0.9;
-            OUT_ARM_SPEED2 = 0.9;
-            outPos1 += (int) (Math.abs(gamepad2.left_stick_y * OUTSLIDE_SPEED));
+    public void verticalSlider() {
+        if (gamepad2.left_stick_y > 0.4) {
+            OUT_ARM_SPEED = -gamepad2.left_stick_y * 1.0;
+            outPos1 += (int) (Math.abs(gamepad2.left_stick_y) * OUTSLIDE_SPEED);
         }
-
-        if (gamepad2.left_stick_y < -0.4)
-        {
-            OUT_ARM_SPEED = 0.9;
-            OUT_ARM_SPEED2 = 0.9;
+        else if (gamepad2.left_stick_y < -0.4) {
+            OUT_ARM_SPEED = -gamepad2.left_stick_y * 1.0;
             outPos1 -= (int) (Math.abs(gamepad2.left_stick_y) * OUTSLIDE_SPEED);
         }
-
-        //Attempt inline code
-        if (Math.abs(robot.outTake1.getCurrentPosition() -  Math.abs(robot.outTake2.getCurrentPosition())) > 10)
-        {
-            if (robot.outTake1.getCurrentPosition() - Math.abs(robot.outTake2.getCurrentPosition()) > 0)
-            {
-                OUT_ARM_SPEED2 = 1.0;
-            }
-            else
-            {
-                OUT_ARM_SPEED = 1.0;
-            }
-        }
-        else {
-            OUT_ARM_SPEED = 0.9;
-            OUT_ARM_SPEED2 = 0.9;
+        else if (outPos1 > 10) {
+            OUT_ARM_SPEED = 0.5;
+        } else {
+            OUT_ARM_SPEED = 0.0;
         }
 
-        //hotkey
-        if (gamepad2.x)
-        {
-            outPos1 = OUTTAKE_MAX;
-        }
+        // Ensure outPos1 stays within limits
+        if (outPos1 < OUTTAKE_MIN) outPos1 = OUTTAKE_MIN;
+        if (outPos1 > OUTTAKE_MAX) outPos1 = OUTTAKE_MAX;
 
-        if (gamepad2.a && !gamepad2.start)
-        {
-            outPos1 = OUTTAKE_MIN;
-        }
+        // Set the motors to RUN_TO_POSITION mode before setting position and power
+        robot.outTake1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.outTake2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        outTake(outPos1);
+        // Set target position and power
+        robot.outTake1.setTargetPosition(outPos1);
+        robot.outTake2.setTargetPosition(outPos1);
+        robot.outTake1.setPower(OUT_ARM_SPEED);
+        robot.outTake2.setPower(OUT_ARM_SPEED);
     }
+
 
     public void arms() {
         //auto outtake
