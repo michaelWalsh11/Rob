@@ -215,11 +215,40 @@ public class DriveBasic extends OpMode {
 
             Thread.sleep(400);
 
-            robot.rightRear.setTargetPosition(robot.rightRear.getCurrentPosition() + 400);
-            robot.leftRear.setTargetPosition(robot.rightRear.getCurrentPosition() + 400);
+            robot.rightRear.setPower(1.0);
+            robot.leftRear.setPower(1.0);
+
+            robot.rightRear.setTargetPosition(robot.rightRear.getCurrentPosition() + 800);
+            robot.leftRear.setTargetPosition(robot.leftRear.getCurrentPosition() + 800);
 
             robot.rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            Thread.sleep(1500);
+
+            lArmPos = 2500; // tune
+            rArmPos = -2500; // tune
+
+            Thread.sleep(1000);
+
+            robot.rightRear.setPower(1.0);
+            robot.leftRear.setPower(1.0);
+
+            robot.rightRear.setTargetPosition(robot.rightRear.getCurrentPosition() - 1800);
+            robot.leftRear.setTargetPosition(robot.leftRear.getCurrentPosition() - 1800);
+
+            robot.rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            Thread.sleep(3000);
+
+            robot.kickLeft.setPosition(KICKLEFT_UP);
+            robot.kickRight.setPosition(KICKRIGHT_UP);
+
+            lArmPos = 100; // tune
+            rArmPos = -100; //tune
+
+
         }
 
     }
@@ -279,6 +308,7 @@ public class DriveBasic extends OpMode {
             robot.outTake2.setPower(0.8);
             //robot.outTake1.setPower(0);
         }
+
 
         telemetry.addLine("" + robot.outTake1.getCurrentPosition());
         telemetry.addLine("" + robot.outTake2.getCurrentPosition());
@@ -347,13 +377,12 @@ public class DriveBasic extends OpMode {
 
 
 
-
-        if (gamepad2.left_trigger > 0.4)
+        if (gamepad2.right_trigger > 0.4)
         {
             robot.grasper.setPosition(GRASPER_OPEN);
         }
 
-        if (gamepad2.right_trigger > 0.4)
+        if (gamepad2.left_trigger > 0.4)
         {
             robot.grasper.setPosition(GRASPER_CLOSE);
         }
