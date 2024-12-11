@@ -1,6 +1,14 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import androidx.annotation.NonNull;
 
@@ -9,18 +17,14 @@ import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import static org.firstinspires.ftc.teamcode.DriveConstants.*;
 
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-public class AutoCommands {
-
-    public AutoCommands()
-    {
-
-    }
+@Autonomous(name="Test Auto", group="Autonomous")
+public class testBasic extends LinearOpMode {
 
     public class Intake {
 
@@ -293,4 +297,62 @@ public class AutoCommands {
             return new Close();
         }
     }
+
+    public class Sleep
+    {
+        public Sleep()
+        {
+
+        }
+        public class oneSecond implements Action {
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return false;
+            }
+
+        }
+
+        public Action oneSec()
+        {
+            return new oneSecond();
+        }
+    }
+
+    @Override
+    public void runOpMode() {
+
+        Pose2d pose = new Pose2d(0, 0, Math.toRadians(90));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, pose);
+
+        Grasper grasper = new Grasper(hardwareMap);
+        Rotator rotator = new Rotator(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
+        Outtake outtake = new Outtake(hardwareMap);
+        OuttakeServo bucket = new OuttakeServo(hardwareMap);
+        KickStands kickstands = new KickStands(hardwareMap);
+
+        Sleep sleep = new Sleep();
+
+        TrajectoryActionBuilder action = drive.actionBuilder(pose)
+                .strafeToLinearHeading(new Vector2d(10, 10), Math.toRadians(90));
+
+        waitForStart();
+
+        Actions.runBlocking(
+                new SequentialAction(
+                        action.build(),
+                        bucket.intake()
+                )
+        );
+
+
+
+    }
 }
+
