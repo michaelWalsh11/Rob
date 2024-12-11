@@ -3,16 +3,16 @@ package org.firstinspires.ftc.teamcode;
 public class DriveConstants {
 
     //set positions
-    public static double KICKRIGHT_DOWN = 0.0; //DO
-    public static double KICKLEFT_DOWN = 0.0; //DO
+    public static double KICKRIGHT_DOWN = 0.66; //DO
+    public static double KICKLEFT_DOWN = 0.33; //DO
     public static double KICKRIGHT_UP = 0.0; //DO
-    public static double KICKLEFT_UP = 0.0; //DO
+    public static double KICKLEFT_UP = 1.0; //DO
 
     public static double OUTTAKE_DROP = 0.5;
-    public static double OUTTAKE_INTAKE = 0.85;
+    public static double OUTTAKE_INTAKE = 0.88;
 
-    public static double GRASPER_OPEN = 0.3;
-    public static double GRASPER_CLOSE = 0.85;
+    public static double GRASPER_OPEN = 0.85;
+    public static double GRASPER_CLOSE = 0.3;
 
     public static double ROTATOR_GROUND = 0.1;
     public static double ROTATOR_TRANSFER = 0.93;
@@ -27,6 +27,7 @@ public class DriveConstants {
     public static int AFTER_CLOSE_SLEEP = 200;
     public static int TRANSFER_TIME = 500;
     public static int AFTER_OPEN_SLEEP = 500;
+    public static int IN_TIME = 500;
 
     //speeds
     public static double INSLIDE_SPEED = 15.0;

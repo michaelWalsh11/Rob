@@ -62,29 +62,29 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
-        public double inPerTick = 0.00195483; // 511.554167 in the inverse
-        public double lateralInPerTick = 0.0012558283848503203;
-        public double trackWidthTicks = 7000.517367943171;
+        public double inPerTick = 0.0019693762; // 507.775 in the inverse
+        public double lateralInPerTick = 0.0013127533918649787;
+        public double trackWidthTicks = 7022.020199319008;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.708644258831641; // default = 0
-        public double kV = 0.0003892397090374108; // default = 0
-        public double kA =  0.00006; // default = 0       //change by factor of 10 until
+        public double kS = 1.3330946585353938; // default = 0
+        public double kV = 0.00038622202533914265; // default = 0
+        public double kA =  0.000085; // default = 0       //change by factor of 10 until
         // shows a severe difference
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 10;
-        public double minProfileAccel = -5;
-        public double maxProfileAccel = 5;
+        public double maxWheelVel = 40;
+        public double minProfileAccel = -20;
+        public double maxProfileAccel = 20;
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path
         public double maxAngAccel = Math.PI;
 
         // path controller gains defaults = 0.0
-        public double axialGain = 5.0;
-        public double lateralGain = 2.0;
-        public double headingGain = 4.25; // shared with turn
+        public double axialGain = 3;
+        public double lateralGain = 10;
+        public double headingGain = 3; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
@@ -217,10 +217,10 @@ public final class MecanumDrive {
 
         // TODO: make sure your config has motors with these names (or change them)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftfront");
+        leftBack = hardwareMap.get(DcMotorEx.class, "leftrear");
+        rightBack = hardwareMap.get(DcMotorEx.class, "rightrear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightfront");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -25,6 +25,9 @@ public class DriveBasic extends OpMode {
     private double ARM_SPEED = 0.7;
     private double ARM_SPEED_ANGLER = 0.7;
 
+    private int lArmPos = 0;
+    private int rArmPos = 0;
+
     private double IN_ARM_SPEED = 0.7;
     private double OUT_ARM_SPEED = 0.7;
     private double OUT_ARM_SPEED2 = 0.7;
@@ -109,13 +112,23 @@ public class DriveBasic extends OpMode {
         grasper();
         arms();
         telemetry();
-        verticalSlider();
+        controlMotors();
 
         // Run intake in a separate thread if multi-Threading breaks remove thread
         new Thread(() -> {
             try {
                 intake();
             } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+
+        //Thread III the cool cat
+        new Thread(() -> {
+            try {
+                hang();
+            } catch (InterruptedException e)
+            {
                 throw new RuntimeException(e);
             }
         }).start();
@@ -194,56 +207,87 @@ public class DriveBasic extends OpMode {
         robot.inTake2.setPower(IN_ARM_SPEED);
     }
 
+    public void hang() throws InterruptedException
+    {
+        if (gamepad1.y) {
+            robot.kickLeft.setPosition(KICKLEFT_DOWN);
+            robot.kickRight.setPosition(KICKRIGHT_DOWN);
+
+            Thread.sleep(400);
+
+            robot.rightRear.setTargetPosition(robot.rightRear.getCurrentPosition() + 400);
+            robot.leftRear.setTargetPosition(robot.rightRear.getCurrentPosition() + 400);
+
+            robot.rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+    }
+
     public void intake() throws  InterruptedException
     {
         if (gamepad2.dpad_up)
         {
+
             robot.grasper.setPosition(GRASPER_CLOSE);
             Thread.sleep(AFTER_CLOSE_SLEEP);
+
+            inPos1 = 0;
+            inPos2 = 0;
+            IN_ARM_SPEED = 0.7;
+
+            Thread.sleep(IN_TIME);
+
             robot.outtake.setPosition(OUTTAKE_INTAKE);
             Thread.sleep(400);
+
             robot.rotator.setPosition(ROTATOR_TRANSFER);
             rotatePos = ROTATOR_TRANSFER;
             Thread.sleep(TRANSFER_TIME);
+
             robot.grasper.setPosition(GRASPER_OPEN);
             Thread.sleep(AFTER_OPEN_SLEEP);
+
             robot.rotator.setPosition(ROTATOR_GROUND);
             rotatePos = ROTATOR_GROUND;
         }
     }
 
-    public void verticalSlider() {
-        if (gamepad2.left_stick_y > 0.4) {
-            OUT_ARM_SPEED = -gamepad2.left_stick_y * 1.0;
-            outPos1 += (int) (Math.abs(gamepad2.left_stick_y) * OUTSLIDE_SPEED);
-        }
-        else if (gamepad2.left_stick_y < -0.4) {
-            OUT_ARM_SPEED = -gamepad2.left_stick_y * 1.0;
-            outPos1 -= (int) (Math.abs(gamepad2.left_stick_y) * OUTSLIDE_SPEED);
-        }
-        else if (outPos1 > 10) {
-            OUT_ARM_SPEED = 0.5;
+    public void controlMotors() {
+
+        // Get input from the gamepad stick
+        double motorPower = -gamepad2.left_stick_y;  // Invert so up is positive
+
+        // Threshold for small movements (deadzone)
+        if (Math.abs(motorPower) > 0.4) {
+            // If moving, set power to both motors
+            robot.outTake1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.outTake2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.outTake1.setPower(motorPower);
+            robot.outTake2.setPower(-motorPower);
+            lArmPos = robot.outTake1.getCurrentPosition();
+            rArmPos = robot.outTake2.getCurrentPosition();
         } else {
-            OUT_ARM_SPEED = 0.0;
+            // If stick is neutral, hold the position
+            //robot.outTake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //robot.outTake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.outTake1.setTargetPosition(lArmPos);
+            robot.outTake2.setTargetPosition(rArmPos);
+            robot.outTake1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.outTake2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.outTake1.setPower(0.8); // Holding power (tune as necessary)
+            robot.outTake2.setPower(0.8);
+            //robot.outTake1.setPower(0);
         }
 
-        // Ensure outPos1 stays within limits
-        if (outPos1 < OUTTAKE_MIN) outPos1 = OUTTAKE_MIN;
-        if (outPos1 > OUTTAKE_MAX) outPos1 = OUTTAKE_MAX;
-
-        // Set the motors to RUN_TO_POSITION mode before setting position and power
-        robot.outTake1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.outTake2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        // Set target position and power
-        robot.outTake1.setTargetPosition(outPos1);
-        robot.outTake2.setTargetPosition(outPos1);
-        robot.outTake1.setPower(OUT_ARM_SPEED);
-        robot.outTake2.setPower(OUT_ARM_SPEED);
+        telemetry.addLine("" + robot.outTake1.getCurrentPosition());
+        telemetry.addLine("" + robot.outTake2.getCurrentPosition());
+        telemetry.addLine("" + motorPower);
+        // Button to go to position 0
     }
 
 
-    public void arms() {
+        public void arms() {
         //auto outtake
 
         if (gamepad1.dpad_down)
@@ -256,6 +300,12 @@ public class DriveBasic extends OpMode {
         {
             robot.kickLeft.setPosition(KICKLEFT_UP); // FIND DATA FOR UP
             robot.kickRight.setPosition(KICKRIGHT_UP); //FIND DATA FOR UP
+        }
+
+        if (gamepad1.b && !gamepad1.start)
+        {
+            robot.kickLeft.setPosition(0.0); // FIND DATA FOR UP
+            robot.kickRight.setPosition(1.0);
         }
 
 
@@ -335,11 +385,11 @@ public class DriveBasic extends OpMode {
     {
 
         //twist left and right
-        if (gamepad2.right_bumper)
+        if (gamepad2.left_bumper)
         {
             rotatePos = Math.min(rotatePos + ROTATE_SPEED, 1.0);;
         }
-        if (gamepad2.left_bumper)
+        if (gamepad2.right_bumper)
         {
             rotatePos = Math.max(rotatePos - ROTATE_SPEED, 0.0);
         }
@@ -370,6 +420,11 @@ public class DriveBasic extends OpMode {
         {
             rand1 = false;
         }
+
+        robot.leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftX = gamepad1.left_stick_x * DRIVE_SPEED;
         leftY = gamepad1.left_stick_y * DRIVE_SPEED;
