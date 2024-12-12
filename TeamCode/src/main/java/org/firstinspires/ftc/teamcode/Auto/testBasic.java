@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -96,55 +97,72 @@ public class testBasic extends LinearOpMode {
         public Outtake(HardwareMap hardwareMap) {
             outTake1 = hardwareMap.get(DcMotorEx.class, "outtake1");
             outTake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            outTake1.setDirection(DcMotorSimple.Direction.REVERSE);
+            outTake1.setDirection(DcMotorSimple.Direction.FORWARD);
 
             outTake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
             outTake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            outTake2.setDirection(DcMotorSimple.Direction.FORWARD);
+            outTake2.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         }
 
         public class OuttakeToPos implements Action {
-            private final double targetPosition;
+            private final int targetPosition;
             private final double holdingPower;
+            private final double direction;
             private boolean initialized = false;
 
-            public OuttakeToPos(double targetPosition, double holdingPower) {
+            public OuttakeToPos(int targetPosition, double holdingPower, double direction) {
                 this.targetPosition = targetPosition;
                 this.holdingPower = holdingPower;
+                this.direction = direction;
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized)
                 {
-                    outTake1.setPower(0.8);
-                    outTake2.setPower(0.8);
+
                     initialized = true;
                 }
 
-                double pos = outTake1.getCurrentPosition();
+                outTake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                outTake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                outTake1.setPower(direction);
+                outTake2.setPower(direction);
+
+                packet.put("outtake1Pos", outTake1.getCurrentPosition());
+                packet.put("outtake2Pos", outTake2.getCurrentPosition());
+
+
+                int pos = outTake1.getCurrentPosition();
                 packet.put("liftPos", pos);
-                if (pos < targetPosition) {
-                    return true; // Continue running the action
+                if (Math.abs(targetPosition - pos) > 20) {
+                    return true;
                 }
                 else
                 {
+                    outTake1.setTargetPosition(pos);
+                    outTake2.setTargetPosition(pos);
+                    outTake1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    outTake2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     outTake1.setPower(holdingPower);  // Apply a small power to hold the position
                     outTake2.setPower(holdingPower);
                     return false; // Stop running, but maintain hold
                 }
             }
 
+
+
             // Method to create actions with holding power
         }
 
         public Action in() {
-            return new OuttakeToPos(OUTTAKE_MIN, 0.2);
+            return new OuttakeToPos(0, 0.4, -1.0);
         }
 
         public Action out() {
-            return new OuttakeToPos(OUTTAKE_MAX, 0.2);
+            return new OuttakeToPos(OUTTAKE_MAX, 0.4, 1.0);
         }
 
     }
@@ -167,6 +185,15 @@ public class testBasic extends LinearOpMode {
             }
         }
 
+        public class RotateMid implements Action {
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                rotator.setPosition(ROTATOR_MID);
+                return false;
+            }
+        }
+
         public class RotateGround implements Action {
 
             @Override
@@ -178,6 +205,10 @@ public class testBasic extends LinearOpMode {
 
         public Action ground() {
             return new RotateGround();
+        }
+
+        public Action mid() {
+            return new RotateMid();
         }
 
         public Action transfer() {
@@ -318,9 +349,28 @@ public class testBasic extends LinearOpMode {
 
         }
 
+        public class half implements Action {
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return false;
+            }
+
+        }
+
         public Action oneSec()
         {
             return new oneSecond();
+        }
+
+        public Action half()
+        {
+            return new half();
         }
     }
 
@@ -340,16 +390,72 @@ public class testBasic extends LinearOpMode {
         Sleep sleep = new Sleep();
 
         TrajectoryActionBuilder action = drive.actionBuilder(pose)
-                .strafeToLinearHeading(new Vector2d(10, 10), Math.toRadians(90));
+                .strafeToLinearHeading(new Vector2d(-15, 8), Math.toRadians(45));
+
+        TrajectoryActionBuilder action2 = drive.actionBuilder(new Pose2d(-15, 8, Math.toRadians(45)))
+                .strafeToLinearHeading(new Vector2d(-18, 4.5), Math.toRadians(45));
+
+        TrajectoryActionBuilder action3 = drive.actionBuilder(new Pose2d(-18, 4.5, Math.toRadians(45)))
+                        .strafeToLinearHeading(new Vector2d(-12, 10), Math.toRadians(90));
+
+        TrajectoryActionBuilder action4 = drive.actionBuilder(new Pose2d(-12, 10, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-7.5, 22), Math.toRadians(90));
+
+        TrajectoryActionBuilder action5 = drive.actionBuilder(new Pose2d(-7.5, 22, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-12, 10), Math.toRadians(45));
+
+        TrajectoryActionBuilder action6 = drive.actionBuilder(new Pose2d(-12, 10, Math.toRadians(45)))
+                .strafeToLinearHeading(new Vector2d(-18.5, 4), Math.toRadians(45));
+
 
         waitForStart();
 
         Actions.runBlocking(
                 new SequentialAction(
-                        action.build(),
-                        bucket.intake()
+                        new ParallelAction(
+                                rotator.mid(),
+                                bucket.intake(),
+                                outtake.out(),
+                                action.build()
+                        ),
+                        action2.build(),
+                        sleep.half(),
+                        bucket.drop(),
+                        sleep.half(),
+                        new ParallelAction(
+                                action3.build(),
+                                outtake.in()
+                        ),
+                        rotator.ground(),
+                        grasper.open(),
+                        action4.build(),
+                        sleep.half(),
+                        grasper.close(),
+                        bucket.intake(),
+                        sleep.half(),
+                        rotator.transfer(),
+                        sleep.half(),
+                        grasper.open(),
+                        sleep.half(),
+                        rotator.mid(),
+                        new ParallelAction(
+                                outtake.out(),
+                                action5.build()
+                        ),
+                        sleep.half(),
+                        action6.build(),
+                        sleep.half(),
+                        bucket.drop(),
+                        sleep.half()
+
                 )
         );
+
+
+        while (opModeIsActive())
+        {
+
+        }
 
 
 
