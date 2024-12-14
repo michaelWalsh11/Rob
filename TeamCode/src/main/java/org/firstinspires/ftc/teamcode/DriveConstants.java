@@ -17,6 +17,10 @@ public class DriveConstants {
     public static double GRASPER_OPEN = 0.85;
     public static double GRASPER_CLOSE = 0.3;
 
+    public static double AUTO_HANG_HANG = 0.4;
+    public static double AUTO_HANG_DOWN = 0.56;
+    public static double AUTO_HANG_VERT = 0.7;
+
     public static double ROTATOR_GROUND = 0.07;
     public static double ROTATOR_MID = 0.5;
     public static double ROTATOR_TRANSFER = 0.93;
@@ -25,7 +29,7 @@ public class DriveConstants {
     public static int INTAKE_MAX = 100; //DO
 
     public static int OUTTAKE_MIN = 0;
-    public static int OUTTAKE_MAX = 4200; //DO
+    public static int OUTTAKE_MAX = 4170; //DO
 
     //sleep constants
     public static int AFTER_CLOSE_SLEEP = 200;

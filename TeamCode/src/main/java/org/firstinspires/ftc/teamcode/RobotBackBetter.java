@@ -29,6 +29,8 @@ public class RobotBackBetter {
     public Servo kickLeft = null;
     public Servo kickRight = null;
 
+    public Servo lowHang = null;
+
     public IMU imu;
     public double offset = 0;//in degrees
 
@@ -82,6 +84,8 @@ public class RobotBackBetter {
 
         kickLeft = hwMap.servo.get("kickleft");
         kickRight = hwMap.servo.get("kickright");
+
+        lowHang = hwMap.servo.get("lowHang");
 
         imu = hwMap.get(IMU.class, "imu");
 

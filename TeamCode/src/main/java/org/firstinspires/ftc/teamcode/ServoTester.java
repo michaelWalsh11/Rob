@@ -23,6 +23,7 @@ public class ServoTester extends OpMode {
     public double rotatePos2;
     public double rotatePos3;
     public double rotatePos4;
+    public double rotatePos5;
 
 
     public int inPos1;
@@ -165,6 +166,17 @@ public class ServoTester extends OpMode {
 
         robot.kickRight.setPosition(rotatePos4);
 
+        if (gamepad1.right_bumper)
+        {
+            rotatePos5 = Math.min(rotatePos5 + 0.001, 1.0);
+        }
+        if (gamepad1.left_bumper)
+        {
+            rotatePos5 = Math.max(rotatePos5 - 0.001, 0.0);
+        }
+
+        robot.lowHang.setPosition(rotatePos5);
+
 
         if (gamepad2.left_stick_y > 0.4)
         {
@@ -212,6 +224,7 @@ public class ServoTester extends OpMode {
         telemetry.addLine("");
         telemetry.addLine("kickstand 1 pos (dpad_up and dpad_down) " + rotatePos3 + "  " + robot.kickLeft.getPosition());
         telemetry.addLine("kickstand 2 pos (a and y) " + rotatePos4 + "  " + robot.kickRight.getPosition());
+        telemetry.addLine("lowHang (lb and rb) " + rotatePos5 + "  " + robot.lowHang.getPosition());
 
 
     }
